@@ -10,7 +10,7 @@ class CmsTest extends TestCase {
  private function admin(): User { return User::create(['name'=>'Équipe','email'=>'admin@example.test','password'=>'a-secure-test-password','is_admin'=>true]); }
  public function test_public_pages_render_and_admin_requires_login(): void {
   foreach(['/','/actualites','/galerie','/admin/connexion'] as $url){$this->get($url)->assertOk();}
-  $this->get('/')->assertSee('Accueil')->assertSee('aria-current="page"',false);
+  $this->get('/')->assertSee('Accueil')->assertSee('aria-current="page"',false)->assertSee('icons.css')->assertSee('icons.js');
   $this->get('/admin')->assertRedirect('/admin/connexion');
   $this->post('/admin/posts',['title'=>'Intrusion'])->assertRedirect('/admin/connexion');
  }
