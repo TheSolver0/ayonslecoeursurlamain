@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\{Post,Album,Setting};
 class DatabaseSeeder extends Seeder {
  public function run(): void {
+  $this->call(AdminUserSeeder::class);
   Setting::firstOrCreate(['id'=>1],['values'=>config('association')]);
   $slug='distribution-fournitures-scolaires-septembre-2025';
   if(!Post::where('slug',$slug)->exists()){

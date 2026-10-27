@@ -5,6 +5,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\{Storage,Hash};
 use Illuminate\Http\UploadedFile;
 use App\Models\{User,Post,Album,Photo};
+use Database\Seeders\AdminUserSeeder;
 class CmsTest extends TestCase {
  use RefreshDatabase;
  private function admin(): User { return User::create(['name'=>'Équipe','email'=>'admin@example.test','password'=>'a-secure-test-password','is_admin'=>true]); }
@@ -13,6 +14,12 @@ class CmsTest extends TestCase {
   $this->get('/')->assertSee('Accueil')->assertSee('aria-current="page"',false)->assertSee('icons.css')->assertSee('icons.js');
   $this->get('/admin')->assertRedirect('/admin/connexion');
   $this->post('/admin/posts',['title'=>'Intrusion'])->assertRedirect('/admin/connexion');
+  $this->get('/admin/connexion')->assertSee('data-password-toggle',false)->assertSee('icons.js')->assertSee('login.js');
+ }
+ public function test_admin_seeder_promotes_existing_configured_account_without_changing_password(): void {
+  $user=User::create(['name'=>'Ancien nom','email'=>'admin@ayonslecoeursurlamain.com','password'=>'existing-secure-password','is_admin'=>false]);$hash=$user->password;
+  $this->seed(AdminUserSeeder::class);
+  $user->refresh();$this->assertTrue($user->is_admin);$this->assertSame('Administration',$user->name);$this->assertSame($hash,$user->password);
  }
  public function test_normal_user_cannot_access_admin(): void {
   $user=User::create(['name'=>'Visiteur','email'=>'visitor@example.test','password'=>'a-secure-test-password']);
